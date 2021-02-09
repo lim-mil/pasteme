@@ -8,6 +8,7 @@ authors = ["lim-mil <limyel@outlook.com>"]
 python = "^3.8"
 starlette = {extras = ["full"], version = "^0.14.2"}
 uvicorn = "^0.13.3"
+peewee = "^3.14.1"
 
 [tool.poetry.dev-dependencies]
 pytest = "^5.2"
