@@ -28,4 +28,4 @@ app = Starlette(debug=True, routes=routes, middleware=middleware, on_startup=on_
 
 
 if __name__ == '__main__':
-    uvicorn.run(app, reload=True, host=config.HOST, port=config.PORT)
+    uvicorn.run(app=app, host=config.HOST, port=config.PORT)
