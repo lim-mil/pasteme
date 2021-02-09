@@ -1,4 +1,4 @@
-from play_starlette import __version__
+from pasteme import __version__
 
 
 def test_version():

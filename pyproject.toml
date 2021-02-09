@@ -1,8 +1,8 @@
 [tool.poetry]
-name = "play-starlette"
+name = "pasteme"
 version = "0.1.0"
 description = ""
-authors = ["senyan <senyan@qq.com>"]
+authors = ["lim-mil <limyel@outlook.com>"]
 
 [tool.poetry.dependencies]
 python = "^3.8"

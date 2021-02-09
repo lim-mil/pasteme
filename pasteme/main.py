@@ -2,7 +2,7 @@ import uvicorn
 from starlette.applications import Starlette
 from starlette.routing import Route
 
-from play_starlette import config
+from pasteme import config
 
 routes = [
 
