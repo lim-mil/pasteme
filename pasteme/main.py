@@ -4,10 +4,11 @@ from starlette.routing import Route
 
 from pasteme import config
 from pasteme.pkg.db import create_table
+from pasteme.api.user import mount as user_monut
 
 
 routes = [
-
+    user_monut,
 ]
 
 

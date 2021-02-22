@@ -12,6 +12,7 @@ peewee = "^3.14.1"
 peewee-async = "^0.7.1"
 aiomysql = "^0.0.21"
 cryptography = "^3.4.4"
+pyjwt = "^2.0.1"
 
 [tool.poetry.dev-dependencies]
 pytest = "^5.2"

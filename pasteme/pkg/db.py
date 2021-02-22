@@ -1,8 +1,11 @@
 from peewee_async import MySQLDatabase
 
+from pasteme import config
 
-MYSQL_DB = MySQLDatabase('pasteme', **{'charset': 'utf8', 'use_unicode': True, 'host': 'localhost', 'port': 3306,
-                                        'user': 'root', 'password': '107382+1s'})
+
+# peewee async
+MYSQL_DB = MySQLDatabase(config.DB_NAME, **{'charset': 'utf8', 'use_unicode': True, 'host': config.DB_HOST, 'port': config.DB_PORT,
+                                        'user': config.DB_USER, 'password': config.DB_PASSWORD})
 
 
 def create_table():

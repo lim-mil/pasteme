@@ -1,6 +1,10 @@
+import asyncio
+
+import peewee_async
 from peewee import CharField
 
-from pasteme.models.base import BaseModel
+from pasteme.models.base import BaseModel, BaseManager
+from pasteme.pkg.db import MYSQL_DB
 
 
 class UserModel(BaseModel):
@@ -10,3 +14,11 @@ class UserModel(BaseModel):
 
     class Meta:
         table_name = 'user_model'
+
+
+# async
+class UserModelManager(BaseManager):
+    model = UserModel
+
+
+user_model_manager = UserModelManager()
