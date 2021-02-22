@@ -4,6 +4,6 @@ import os
 BASE_DIR = os.path
 
 HOST = 'localhost'
-PORT = 7331
+PORT = 9999
 
 SQLITE_PATH = ''

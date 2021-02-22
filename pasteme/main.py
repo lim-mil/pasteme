@@ -3,6 +3,8 @@ from starlette.applications import Starlette
 from starlette.routing import Route
 
 from pasteme import config
+from pasteme.pkg.db import create_table
+
 
 routes = [
 
@@ -15,7 +17,7 @@ middleware = [
 
 
 on_startup = [
-
+    create_table
 ]
 
 
