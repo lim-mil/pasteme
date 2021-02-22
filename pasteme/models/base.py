@@ -2,6 +2,7 @@ from typing import Optional
 
 import peewee_async
 from peewee import Model, IntegerField, AutoField, DoesNotExist
+from starlette.authentication import BaseUser
 
 from pasteme.pkg.db import MYSQL_DB
 from pasteme.utils.time_util import get_current_ts
@@ -43,3 +44,13 @@ class BaseManager:
             return await self.manager.get(self.model, **kwargs)
         except DoesNotExist:
             return None
+
+
+class AuthUser(BaseUser):
+    @property
+    def is_authenticated(self) -> bool:
+        return True
+
+    @property
+    def display_name(self) -> str:
+        return self.username

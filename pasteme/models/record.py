@@ -1,6 +1,6 @@
 from peewee import IntegerField, CharField, TextField
 
-from pasteme.models.base import BaseModel
+from pasteme.models.base import BaseModel, BaseManager
 
 
 class RECORD_STATUS:
@@ -15,3 +15,10 @@ class RecordModel(BaseModel):
 
     class Meta:
         table_name = 'record_model'
+
+
+class RecordModelManager(BaseManager):
+    model = RecordModel
+
+
+record_model_manager = RecordModelManager()
