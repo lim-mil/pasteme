@@ -5,7 +5,7 @@ from starlette.responses import PlainTextResponse, JSONResponse
 from starlette.routing import Mount, Route
 
 from pasteme.models.user import user_model_manager, UserModel
-from pasteme.pkg.jwt_util import create_jwt_token
+from pasteme.pkg.security_util import create_jwt_token
 
 
 async def register(request: Request):

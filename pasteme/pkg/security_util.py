@@ -1,3 +1,4 @@
+import datetime
 from typing import Optional
 
 import jwt
@@ -33,3 +34,16 @@ class SecurityBackend(AuthenticationBackend):
 
         if user:
             return AuthCredentials(['user']), user
+
+
+def create_jwt_token(user: UserModel):
+    headers = {
+        'typ': 'jwt',
+        'alg': 'HS256'
+    }
+    payload = {
+        'exp': datetime.datetime.utcnow() + datetime.timedelta(hours=24),
+        'username': user.username
+    }
+    token = jwt.encode(headers=headers, payload=payload, key=config.JWT_SECRET, algorithm='HS256')
+    return token
