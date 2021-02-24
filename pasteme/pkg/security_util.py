@@ -30,7 +30,7 @@ class SecurityBackend(AuthenticationBackend):
             pass
 
         username = payload.get('username')
-        user: Optional[UserModel] = await user_model_manager.get_or_none(username=username)
+        user: Optional[UserModel] = await user_model_manager.get_or_none(UserModel.username==username)
 
         if user:
             return AuthCredentials(['user']), user

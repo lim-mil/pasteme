@@ -1,7 +1,7 @@
 from typing import Optional
 
 import peewee_async
-from peewee import Model, IntegerField, AutoField, DoesNotExist
+from peewee import Model, IntegerField, AutoField, DoesNotExist, BooleanField
 from starlette.authentication import BaseUser
 
 from pasteme.pkg.db import MYSQL_DB
@@ -10,8 +10,9 @@ from pasteme.utils.time_util import get_current_ts
 
 class BaseModel(Model):
     id = AutoField(index=True, primary_key=True)
-    created = IntegerField(index=True, default=get_current_ts)
-    updated = IntegerField(index=True, default=get_current_ts)
+    created_at = IntegerField(index=True, default=get_current_ts)
+    updated_at = IntegerField(index=True, default=get_current_ts)
+    is_delete = BooleanField(index=True, default=False)
 
     class Meta:
         database = MYSQL_DB
@@ -34,16 +35,21 @@ class BaseManager:
         :param id:
         :return:
         """
-        return await self.manager.get(self.model, id=id)
+        return await self.manager.get(self.model, self.model.id==id)
 
     async def create(self, **kwargs):
         return await self.manager.create(self.model, **kwargs)
 
-    async def get_or_none(self, **kwargs):
+    async def get_or_none(self, *args):
         try:
-            return await self.manager.get(self.model, **kwargs)
+            return await self.manager.get(self.model, *args)
         except DoesNotExist:
             return None
+
+    async def delete_by_id(self, id):
+        obj = await self.get_by_id(id)
+        if obj:
+            await self.manager.delete(obj)
 
 
 class AuthUser(BaseUser):

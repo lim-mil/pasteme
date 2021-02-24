@@ -33,7 +33,7 @@ async def login(reuqest: Request):
         return JSONResponse(result)
 
 
-# 与 django 的 include、fastapi 的 routes 差不多
+# 与 django 的 include、fastapi 的 APIRoute 差不多
 mount = Mount('/users', name='users', routes=[
     Route('/register', register, methods=['POST'], name='register'),
     Route('/login', login, methods=['POST'], name='login'),

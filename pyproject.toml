@@ -13,6 +13,8 @@ peewee-async = "^0.7.1"
 aiomysql = "^0.0.21"
 cryptography = "^3.4.4"
 pyjwt = "^2.0.1"
+aiofiles = "^0.6.0"
+pydantic = "^1.7.3"
 
 [tool.poetry.dev-dependencies]
 pytest = "^5.2"
