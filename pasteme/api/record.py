@@ -1,5 +1,6 @@
 import hashlib
 import os
+from json.decoder import JSONDecodeError
 from typing import Optional
 
 import aiofiles
@@ -25,7 +26,7 @@ async def records_list(request: Request):
     :param request:
     :return:
     """
-    records_user = RecordsUsersModel.select().where(RecordsUsersModel.user_id==request.user.id)
+    records_user = RecordsUsersModel.select().where(RecordsUsersModel.user_id==request.user.id, RecordsUsersModel.is_delete==False)
     result = []
     for i in records_user:
         record = await record_model_manager.get_or_none(RecordModel.id==i.record_id)
@@ -49,7 +50,11 @@ async def create_record(request: Request):
     :return:
     """
     global file_content
-    data = await request.json()
+    try:
+        data = await request.json()
+    except JSONDecodeError as e:
+        data = await request.form()
+
     record_type = data.get('type', 'text')
     content = data.get('content')
 
@@ -92,7 +97,6 @@ async def delete_record(request: Request):
     """
     id = request.path_params['id']
     record_user: Optional[RecordsUsersModel] = await records_users_model_manager.get_or_none(RecordsUsersModel.id==id)
-    print(record_user.user_id)
     if record_user:
         record: Optional[RecordModel] = await record_model_manager.get_or_none(RecordModel.id==record_user.record_id)
         if record:
