@@ -49,9 +49,9 @@ async def create_record(request: Request):
     :return:
     """
     global file_content
-    form = await request.form()
-    record_type = form.get('type', 'text')
-    content = form.get('content')
+    data = await request.json()
+    record_type = data.get('type', 'text')
+    content = data.get('content')
 
     # 比对 md5
     hl = hashlib.md5()
@@ -121,9 +121,9 @@ async def update_record(request: Request):
 
 # 路由参数，和 django 中的差不多，有五种类型——int、str、float、uuid、path
 mount = Mount('/records', name='records', routes=[
-    Route('/{id:int}', retrive_record, name='retrive', methods=['GET']),
-    Route('/{id:int}', update_record, name='update', methods=['PATCH']),
     Route('/', create_record, name='create', methods=['POST']),
     Route('/', records_list, name='list', methods=['GET']),
+    Route('/{id:int}', retrive_record, name='retrive', methods=['GET']),
+    Route('/{id:int}', update_record, name='update', methods=['PATCH']),
     Route('/{id:int}', delete_record, name='delete', methods=['DELETE'])
 ])

@@ -23,7 +23,11 @@ class ResponseContent:
 
 
 def resp_200(*, msg='', data=None) -> JSONResponse:
-    content = ResponseContent(code=HTTPStatus.OK, msg=msg, data=data).to_dict()
+    content = ResponseContent(
+        code=HTTPStatus.OK,
+        msg=msg,
+        data=data
+    ).to_dict()
     return JSONResponse(content=content, status_code=HTTPStatus.OK)
 
 
@@ -32,7 +36,7 @@ def resp_404(*, msg='', data=None) -> JSONResponse:
         code=HTTPStatus.NOT_FOUND,
         msg=msg,
         data=data
-    )
+    ).to_dict()
     return JSONResponse(content=content, status_code=HTTPStatus.NOT_FOUND)
 
 
@@ -41,5 +45,5 @@ def resp_401(*, msg='', data=None) -> JSONResponse:
         code=HTTPStatus.UNAUTHORIZED,
         msg=msg,
         data=data
-    )
+    ).to_dict()
     return JSONResponse(content=content, status_code=HTTPStatus.UNAUTHORIZED)

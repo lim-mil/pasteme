@@ -3,11 +3,12 @@ from typing import Optional
 
 import jwt
 from jwt import ExpiredSignatureError
-from starlette.authentication import AuthenticationBackend, AuthCredentials, SimpleUser
+from starlette.authentication import AuthenticationBackend, AuthCredentials, SimpleUser, AuthenticationError
 from starlette.requests import Request
 
 from pasteme import config
 from pasteme.models.user import UserModel, user_model_manager
+from pasteme.pkg.response import resp_401
 
 
 class SecurityBackend(AuthenticationBackend):
@@ -18,8 +19,12 @@ class SecurityBackend(AuthenticationBackend):
     """
     async def authenticate(self, request: Request):
         global payload
-        if 'Authorization' not in request.headers:
+
+        if request.url.path == '/users/login':
             return
+
+        if 'Authorization' not in request.headers:
+            raise AuthenticationError()
 
         # 就直接从请求头拿 jwt token ...
         authorization = request.headers.get('Authorization')
@@ -28,7 +33,6 @@ class SecurityBackend(AuthenticationBackend):
             payload = jwt.decode(token, algorithms=['HS256'], key=config.JWT_SECRET)
         except ExpiredSignatureError:
             pass
-
         username = payload.get('username')
         user: Optional[UserModel] = await user_model_manager.get_or_none(UserModel.username==username)
 

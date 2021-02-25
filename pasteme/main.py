@@ -2,12 +2,14 @@ import uvicorn
 from starlette.applications import Starlette
 from starlette.middleware import Middleware
 from starlette.middleware.authentication import AuthenticationMiddleware
+from starlette.middleware.cors import CORSMiddleware
 from starlette.routing import Route
 
 from pasteme import config
 from pasteme.pkg.db import create_table
 from pasteme.api.user import mount as user_monut
 from pasteme.api.record import mount as record_mount
+from pasteme.pkg.exception import handle_401
 from pasteme.pkg.security_util import SecurityBackend
 
 routes = [
@@ -17,7 +19,8 @@ routes = [
 
 
 middleware = [
-    Middleware(AuthenticationMiddleware, backend=SecurityBackend())
+    Middleware(CORSMiddleware, allow_origins=['*'], allow_methods=['*'], allow_headers=['*']),
+    Middleware(AuthenticationMiddleware, backend=SecurityBackend(), on_error=handle_401),
 ]
 
 

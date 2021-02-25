@@ -5,6 +5,7 @@ from starlette.responses import PlainTextResponse, JSONResponse
 from starlette.routing import Mount, Route
 
 from pasteme.models.user import user_model_manager, UserModel
+from pasteme.pkg.response import resp_200
 from pasteme.pkg.security_util import create_jwt_token
 
 
@@ -21,16 +22,16 @@ async def register(request: Request):
 
 
 async def login(reuqest: Request):
-    user_info = await reuqest.form()
-    username = user_info.get('username')
+    user_info = await reuqest.json()
+    email = user_info.get('email')
     password = user_info.get('password')
-    user: Optional[UserModel] = await user_model_manager.get_or_none(username=username, password=password)
+    user: Optional[UserModel] = await user_model_manager.get_or_none(UserModel.email==email, UserModel.password==password)
     if user:
         result = {
             'token': create_jwt_token(user),
             'username': user.username
         }
-        return JSONResponse(result)
+        return resp_200(data=result)
 
 
 # 与 django 的 include、fastapi 的 APIRoute 差不多
