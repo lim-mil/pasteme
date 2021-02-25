@@ -14,7 +14,7 @@ from starlette.routing import Mount, Route
 from pasteme.config import MEDIA_DIR
 from pasteme.models.record import record_model_manager, RecordModel, records_users_model_manager, RecordsUsersModel
 from pasteme.pkg.exception import RecordTypeError
-from pasteme.pkg.response import resp_200
+from pasteme.pkg.response import resp_200, resp_404
 from pasteme.schemas.record import RecordOut
 
 
@@ -53,6 +53,7 @@ async def create_record(request: Request):
     record_type = form.get('type', 'text')
     content = form.get('content')
 
+    # 比对 md5
     hl = hashlib.md5()
     if record_type == 'text':
         hl.update(content.encode('utf-8'))
@@ -69,6 +70,7 @@ async def create_record(request: Request):
         await records_users_model_manager.create(user_id=request.user.id, record_id=record.id)
         return resp_200()
 
+    # 存储文件
     if record_type == 'file':
         content = content.filename
         async with aiofiles.open(os.path.join(MEDIA_DIR, content), mode='wb') as f:
@@ -98,6 +100,8 @@ async def delete_record(request: Request):
             record.save()
         record_user.is_delete = True
         record_user.save()
+    else:
+        return resp_404()
     return resp_200()
 
 
@@ -111,7 +115,8 @@ async def update_record(request: Request):
         if record:
             record.content = body.get('content', record.content)
             record.save()
-    return resp_200()
+            return resp_200()
+    return resp_404()
 
 
 # 路由参数，和 django 中的差不多，有五种类型——int、str、float、uuid、path
