@@ -26,7 +26,8 @@ async def records_list(request: Request):
     :param request:
     :return:
     """
-    records_user = RecordsUsersModel.select().where(RecordsUsersModel.user_id==request.user.id, RecordsUsersModel.is_delete==False)
+    records_user = RecordsUsersModel.select().where(RecordsUsersModel.user_id==request.user.id,
+                                                    RecordsUsersModel.is_delete==False).order_by(RecordsUsersModel.created_at.desc())
     result = []
     for i in records_user:
         record = await record_model_manager.get_or_none(RecordModel.id==i.record_id)
