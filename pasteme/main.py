@@ -1,4 +1,5 @@
 import uvicorn
+from pasteme.pkg.redis import REDIS_POOL
 from starlette.applications import Starlette
 from starlette.middleware import Middleware
 from starlette.middleware.authentication import AuthenticationMiddleware
@@ -7,7 +8,6 @@ from starlette.routing import Route, Mount
 from starlette.staticfiles import StaticFiles
 
 from pasteme import config
-from pasteme.pkg.db import create_table
 from pasteme.api.user import mount as user_monut
 from pasteme.api.record import mount as record_mount
 from pasteme.pkg.exception import handle_401
@@ -27,7 +27,7 @@ middleware = [
 
 
 on_startup = [
-    create_table
+    REDIS_POOL.connect
 ]
 
 

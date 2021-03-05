@@ -4,16 +4,17 @@ from json.decoder import JSONDecodeError
 from typing import Optional
 
 import aiofiles
+from pasteme.pkg.redis import GetRedis, RedisTBName
+from pasteme.utils.name_util import give_me_a_name
 from starlette.authentication import requires
 from starlette.datastructures import UploadFile
 from starlette.requests import Request
-from starlette.responses import PlainTextResponse, JSONResponse
+from starlette.responses import PlainTextResponse, JSONResponse, FileResponse
 from starlette.routing import Mount, Route
 
 
 # 权限，AuthCredentials 类的实例，在验证用户的中间件中提供。
 from pasteme.config import MEDIA_DIR
-from pasteme.models.record import record_model_manager, RecordModel, records_users_model_manager, RecordsUsersModel
 from pasteme.pkg.exception import RecordTypeError
 from pasteme.pkg.response import resp_200, resp_404
 from pasteme.schemas.record import RecordOut
@@ -26,6 +27,8 @@ async def records_list(request: Request):
     :param request:
     :return:
     """
+    async with GetRedis() as redis:
+        pass
     records_user = RecordsUsersModel.select().where(RecordsUsersModel.user_id==request.user.id,
                                                     RecordsUsersModel.is_delete==False).order_by(RecordsUsersModel.created_at.desc())
     result = []
@@ -50,85 +53,44 @@ async def create_record(request: Request):
     :param request:
     :return:
     """
-    global file_content
-    try:
-        data = await request.json()
-    except JSONDecodeError as e:
+    async with GetRedis() as redis:
         data = await request.form()
+        file: UploadFile = data.get('file')
+        file_subname = file.filename.split('.')[-1]
+        hl = hashlib.md5()
 
-    record_type = data.get('type', 'text')
-    content = data.get('content')
+        content = await file.read()
+        hl.update(content)
+        md5 = hl.hexdigest()
+        print(md5)
+        if await redis.hexists(RedisTBName.MD5_HASHES.value, md5):
+            filename_server = await redis.hget(RedisTBName.MD5_HASHES.value, md5)
+        else:
+            filename_server = await give_me_a_name()
+            await redis.hset(RedisTBName.MD5_HASHES.value, md5, filename_server)
+            async with aiofiles.open(os.path.join(MEDIA_DIR, filename_server), mode='wb') as f:
+                await f.write(content)
+        id = await give_me_a_name()
+        await redis.hset(id, 'md5', md5)
+        await redis.hset(id, 'filename', file.filename)
 
-    # 比对 md5
-    hl = hashlib.md5()
-    if record_type == 'text':
-        hl.update(content.encode('utf-8'))
-    elif record_type == 'file':
-        file_content = await content.read()
-        hl.update(file_content)
-    else:
-        raise RecordTypeError()
-
-    record: Optional[RecordModel] = await record_model_manager.get_or_none(RecordModel.md5==hl.hexdigest())
-    if record:
-        record.num += 1
-        record.save()
-        await records_users_model_manager.create(user_id=request.user.id, record_id=record.id)
-        return resp_200()
-
-    # 存储文件
-    if record_type == 'file':
-        content = content.filename
-        async with aiofiles.open(os.path.join(MEDIA_DIR, content), mode='wb') as f:
-            await f.write(file_content)
-
-    await record_model_manager.create(content=content, md5=hl.hexdigest(), type=record_type, num=1)
-    record = await record_model_manager.get_or_none(RecordModel.md5==hl.hexdigest())
-    await records_users_model_manager.create(user_id=request.user.id, record_id=record.id)
-
-    return resp_200()
+    return JSONResponse({
+        'id': id
+    })
 
 
 @requires('user')
-async def delete_record(request: Request):
-    """
-    这里的 id，都是 RecordsUsersModel 的 id，因为只有它的id是唯一的
-    :param request:
-    :return:
-    """
-    id = request.path_params['id']
-    record_user: Optional[RecordsUsersModel] = await records_users_model_manager.get_or_none(RecordsUsersModel.id==id)
-    if record_user:
-        record: Optional[RecordModel] = await record_model_manager.get_or_none(RecordModel.id==record_user.record_id)
-        if record:
-            record.num -= 1
-            record.save()
-        record_user.is_delete = True
-        record_user.save()
-    else:
-        return resp_404()
-    return resp_200()
-
-
-@requires('user')
-async def update_record(request: Request):
-    id = request.path_params['id']
-    record_user: Optional[RecordsUsersModel] = await records_users_model_manager.get_or_none(RecordsUsersModel.id==id)
-    if record_user:
-        body = await request.json()
-        record: Optional[RecordModel] = await record_model_manager.get_or_none(RecordModel.id==record_user.record_id)
-        if record:
-            record.content = body.get('content', record.content)
-            record.save()
-            return resp_200()
-    return resp_404()
+async def retrive_record(request: Request):
+    async with GetRedis() as redis:
+        id = request.path_params['id']
+        md5 = await redis.hget(id, 'md5')
+        filename_server = await redis.hget(RedisTBName.MD5_HASHES.value, md5)
+        if filename_server:
+            return FileResponse(os.path.join(MEDIA_DIR, filename_server), filename=await redis.hget(id, 'filename'))
 
 
 # 路由参数，和 django 中的差不多，有五种类型——int、str、float、uuid、path
 mount = Mount('/records', name='records', routes=[
     Route('/', create_record, name='create', methods=['POST']),
-    Route('/', records_list, name='list', methods=['GET']),
-    Route('/{id:int}', retrive_record, name='retrive', methods=['GET']),
-    Route('/{id:int}', update_record, name='update', methods=['PATCH']),
-    Route('/{id:int}', delete_record, name='delete', methods=['DELETE'])
+    Route('/{id:str}', retrive_record, name='retrive', methods=['GET']),
 ])

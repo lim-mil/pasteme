@@ -7,7 +7,6 @@ from starlette.authentication import AuthenticationBackend, AuthCredentials, Sim
 from starlette.requests import Request
 
 from pasteme import config
-from pasteme.models.user import UserModel, user_model_manager
 from pasteme.pkg.response import resp_401
 
 
@@ -34,20 +33,19 @@ class SecurityBackend(AuthenticationBackend):
         except ExpiredSignatureError:
             pass
         username = payload.get('username')
-        user: Optional[UserModel] = await user_model_manager.get_or_none(UserModel.username==username)
 
-        if user:
-            return AuthCredentials(['user']), user
+        if username == config.USERNAME:
+            return AuthCredentials(['user']), {'username': config.USERNAME, 'password': config.PASSWORD}
 
 
-def create_jwt_token(user: UserModel):
+def create_jwt_token(user_info):
     headers = {
         'typ': 'jwt',
         'alg': 'HS256'
     }
     payload = {
         'exp': datetime.datetime.utcnow() + datetime.timedelta(hours=24),
-        'username': user.username
+        'username': user_info.get('username')
     }
     token = jwt.encode(headers=headers, payload=payload, key=config.JWT_SECRET, algorithm='HS256')
     return token

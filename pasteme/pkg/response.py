@@ -28,7 +28,7 @@ def resp_200(*, msg='', data=None) -> JSONResponse:
         msg=msg,
         data=data
     ).to_dict()
-    return JSONResponse(content=content, status_code=HTTPStatus.OK)
+    return JSONResponse(content=content, status_code=200)
 
 
 def resp_404(*, msg='', data=None) -> JSONResponse:
@@ -37,7 +37,7 @@ def resp_404(*, msg='', data=None) -> JSONResponse:
         msg=msg,
         data=data
     ).to_dict()
-    return JSONResponse(content=content, status_code=HTTPStatus.NOT_FOUND)
+    return JSONResponse(content=content, status_code=404)
 
 
 def resp_401(*, msg='', data=None) -> JSONResponse:
