@@ -38,5 +38,5 @@ class RedisTBName(Enum):
     MD5_HASHES = 'pasteme_md5_hashes'           # md5: 存储的文件名
     FILENAME_SETS = 'pasteme_filename_sets'         # 已存在的文件名
     FILEINFO_HASHES = 'pasteme_fileinfo_hashes'         #
-
+    FILEID_SETS = 'pasteme_fileid_sets'         # 文件 id
 

@@ -4,7 +4,7 @@ from typing import Optional
 import jwt
 from jwt import ExpiredSignatureError
 from starlette.authentication import AuthenticationBackend, AuthCredentials, SimpleUser, AuthenticationError
-from starlette.requests import Request
+from starlette.requests import Request, HTTPConnection
 
 from pasteme import config
 from pasteme.pkg.response import resp_401
@@ -16,17 +16,19 @@ class SecurityBackend(AuthenticationBackend):
     简陋，真的简陋...
 
     """
-    async def authenticate(self, request: Request):
+    async def authenticate(self, conn: HTTPConnection):
         global payload
 
-        if request.url.path == '/users/login':
+        if conn.url.path == '/users/login':
+            return
+        if conn.url.path.startswith('/records/') and conn.url.path != '/records/':
             return
 
-        if 'Authorization' not in request.headers:
+        if 'Authorization' not in conn.headers:
             raise AuthenticationError()
 
         # 就直接从请求头拿 jwt token ...
-        authorization = request.headers.get('Authorization')
+        authorization = conn.headers.get('Authorization')
         token = authorization.split(' ')[1]
         try:
             payload = jwt.decode(token, algorithms=['HS256'], key=config.JWT_SECRET)

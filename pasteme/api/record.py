@@ -21,32 +21,6 @@ from pasteme.schemas.record import RecordOut
 
 
 @requires('user')
-async def records_list(request: Request):
-    """
-
-    :param request:
-    :return:
-    """
-    async with GetRedis() as redis:
-        pass
-    records_user = RecordsUsersModel.select().where(RecordsUsersModel.user_id==request.user.id,
-                                                    RecordsUsersModel.is_delete==False).order_by(RecordsUsersModel.created_at.desc())
-    result = []
-    for i in records_user:
-        record = await record_model_manager.get_or_none(RecordModel.id==i.record_id)
-        if record:
-            record_out = RecordOut.from_orm(record)
-            record_out.id = i.id            # 这里的 id 也是 RecordsUsersModel 的 id！！！
-            result.append(record_out.dict())
-    return resp_200(data=result)
-
-
-@requires('user')
-async def retrive_record(request: Request):
-    return PlainTextResponse(request.user.display_name)
-
-
-@requires('user')
 async def create_record(request: Request):
     """
     增加记录，如果记录内容相同（MD5），则在记录的数量加一。
@@ -71,15 +45,13 @@ async def create_record(request: Request):
             async with aiofiles.open(os.path.join(MEDIA_DIR, filename_server), mode='wb') as f:
                 await f.write(content)
         id = await give_me_a_name()
+        await redis.sadd(RedisTBName.FILEID_SETS.value, id)
         await redis.hset(id, 'md5', md5)
         await redis.hset(id, 'filename', file.filename)
 
-    return JSONResponse({
-        'id': id
-    })
+    return resp_200(data={'id': id})
 
 
-@requires('user')
 async def retrive_record(request: Request):
     async with GetRedis() as redis:
         id = request.path_params['id']
@@ -89,8 +61,22 @@ async def retrive_record(request: Request):
             return FileResponse(os.path.join(MEDIA_DIR, filename_server), filename=await redis.hget(id, 'filename'))
 
 
+@requires('user')
+async def retrive_reocrds(request: Request):
+    result = []
+    async with GetRedis() as redis:
+        id_list = await redis.smembers(RedisTBName.FILEID_SETS.value)
+        for id in id_list:
+            item = {}
+            item['id'] = id
+            item['filename'] = await redis.hget(id, 'filename')
+            result.append(item)
+    return resp_200(data=result)
+
+
 # 路由参数，和 django 中的差不多，有五种类型——int、str、float、uuid、path
 mount = Mount('/records', name='records', routes=[
     Route('/', create_record, name='create', methods=['POST']),
+    Route('/', retrive_reocrds, name='retrive_list', methods=['GET']),
     Route('/{id:str}', retrive_record, name='retrive', methods=['GET']),
 ])
