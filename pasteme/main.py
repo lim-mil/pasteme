@@ -3,7 +3,8 @@ from starlette.applications import Starlette
 from starlette.middleware import Middleware
 from starlette.middleware.authentication import AuthenticationMiddleware
 from starlette.middleware.cors import CORSMiddleware
-from starlette.routing import Route
+from starlette.routing import Route, Mount
+from starlette.staticfiles import StaticFiles
 
 from pasteme import config
 from pasteme.pkg.db import create_table
@@ -14,7 +15,8 @@ from pasteme.pkg.security_util import SecurityBackend
 
 routes = [
     user_monut,
-    record_mount
+    record_mount,
+    Mount('/meida', app=StaticFiles(directory='media'), name='media')
 ]
 
 
