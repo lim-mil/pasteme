@@ -19,9 +19,10 @@ class SecurityBackend(AuthenticationBackend):
     async def authenticate(self, conn: HTTPConnection):
         global payload
 
+        # 不需要走验证的请求，后续应该用正则表达式改一下
         if conn.url.path == '/users/login':
             return
-        if conn.url.path.startswith('/records/') and conn.url.path != '/records/':
+        if conn.url.path.startswith('/records/') and conn.url.path != '/records/' and conn.get('method') == 'GET':
             return
 
         if 'Authorization' not in conn.headers:

@@ -12,11 +12,7 @@ LETTERS = [
 
 async def give_me_a_name():
     async with GetRedis() as redis:
-        while True:
-            name = ''.join(random.choices(LETTERS, k=20))
-            if not await redis.sismember(RedisTBName.FILENAME_SETS.value, name):
-                await redis.sadd(RedisTBName.FILENAME_SETS.value, name)
-                break
+        name = ''.join(random.choices(LETTERS, k=20))
     return name
 
 
