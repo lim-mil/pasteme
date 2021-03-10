@@ -1,4 +1,5 @@
 import uvicorn
+from pasteme.pkg.db import create_tables
 from pasteme.pkg.redis import REDIS_POOL
 from starlette.applications import Starlette
 from starlette.middleware import Middleware
@@ -27,7 +28,9 @@ middleware = [
 
 
 on_startup = [
-    REDIS_POOL.connect
+    create_tables,
+    REDIS_POOL.connect,
+
 ]
 
 
