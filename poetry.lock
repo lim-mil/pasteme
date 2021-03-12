@@ -34,6 +34,18 @@ hiredis = "*"
 
 [[package]]
 category = "main"
+description = "asyncio SMTP client"
+name = "aiosmtplib"
+optional = false
+python-versions = ">=3.5.2,<4.0.0"
+version = "1.1.4"
+
+[package.extras]
+docs = ["sphinx (>=2,<4)", "sphinx_autodoc_typehints (>=1.7.0,<2.0.0)"]
+uvloop = ["uvloop (>=0.13,<0.15)"]
+
+[[package]]
+category = "main"
 description = "A library for parsing ISO 8601 strings."
 name = "aniso8601"
 optional = false
@@ -519,7 +531,7 @@ python-versions = "*"
 version = "0.2.5"
 
 [metadata]
-content-hash = "dd0f7624c322209e802851b09925c2f95f92340c39f57a538b7e7db85c7eef19"
+content-hash = "52147885e25898d798eb926ccf24ab7da051abb7066e1bfa50aae4fe662195ec"
 python-versions = "^3.8"
 
 [metadata.files]
@@ -534,6 +546,10 @@ aiomysql = [
 aioredis = [
     {file = "aioredis-1.3.1-py3-none-any.whl", hash = "sha256:b61808d7e97b7cd5a92ed574937a079c9387fdadd22bfbfa7ad2fd319ecc26e3"},
     {file = "aioredis-1.3.1.tar.gz", hash = "sha256:15f8af30b044c771aee6787e5ec24694c048184c7b9e54c3b60c750a4b93273a"},
+]
+aiosmtplib = [
+    {file = "aiosmtplib-1.1.4-py3-none-any.whl", hash = "sha256:93e53edac183f1a608bc34464efeef23902e59e949017b1682014f59ecdcd37d"},
+    {file = "aiosmtplib-1.1.4.tar.gz", hash = "sha256:8270d0a06475aa05b9276fc954fbd08a1f6c59d0452b4899413d8bca1db24541"},
 ]
 aniso8601 = [
     {file = "aniso8601-7.0.0-py2.py3-none-any.whl", hash = "sha256:d10a4bf949f619f719b227ef5386e31f49a2b6d453004b21f02661ccc8670c7b"},

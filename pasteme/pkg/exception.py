@@ -1,4 +1,4 @@
-from pasteme.pkg.response import resp_401
+from pasteme.pkg.response import resp
 
 
 class RecordTypeError(Exception):
@@ -8,4 +8,4 @@ class RecordTypeError(Exception):
 
 
 def handle_401(*args, **kwargs):
-    return resp_401()
+    return resp(code=401)

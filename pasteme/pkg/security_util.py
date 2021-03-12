@@ -7,7 +7,6 @@ from starlette.authentication import AuthenticationBackend, AuthCredentials, Sim
 from starlette.requests import Request, HTTPConnection
 
 from pasteme import config
-from pasteme.pkg.response import resp_401
 
 
 class SecurityBackend(AuthenticationBackend):
@@ -19,7 +18,7 @@ class SecurityBackend(AuthenticationBackend):
     async def authenticate(self, conn: HTTPConnection):
         global payload
 
-        if conn.url.path == '/users/login':
+        if conn.url.path == '/users/login' or conn.url.path == '/users/register':
             return
         if conn.url.path.startswith('/records/') and conn.url.path != '/records/':
             return

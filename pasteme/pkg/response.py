@@ -22,28 +22,10 @@ class ResponseContent:
         }
 
 
-def resp_200(*, msg='', data=None) -> JSONResponse:
+def resp(*, code=200, msg='', data=None, **kwargs) -> JSONResponse:
     content = ResponseContent(
-        code=HTTPStatus.OK,
+        code=code,
         msg=msg,
         data=data
     ).to_dict()
-    return JSONResponse(content=content, status_code=200)
-
-
-def resp_404(*, msg='', data=None) -> JSONResponse:
-    content = ResponseContent(
-        code=HTTPStatus.NOT_FOUND,
-        msg=msg,
-        data=data
-    ).to_dict()
-    return JSONResponse(content=content, status_code=404)
-
-
-def resp_401(*, msg='', data=None) -> JSONResponse:
-    content = ResponseContent(
-        code=HTTPStatus.UNAUTHORIZED,
-        msg=msg,
-        data=data
-    ).to_dict()
-    return JSONResponse(content=content, status_code=HTTPStatus.UNAUTHORIZED)
+    return JSONResponse(content=content, status_code=code, **kwargs)

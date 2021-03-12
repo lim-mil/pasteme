@@ -16,7 +16,7 @@ from starlette.routing import Mount, Route
 # 权限，AuthCredentials 类的实例，在验证用户的中间件中提供。
 from pasteme.config import MEDIA_DIR
 from pasteme.pkg.exception import RecordTypeError
-from pasteme.pkg.response import resp_200, resp_404
+from pasteme.pkg.response import resp
 from pasteme.schemas.record import RecordOut
 
 
@@ -49,7 +49,7 @@ async def create_record(request: Request):
         await redis.hset(id, 'md5', md5)
         await redis.hset(id, 'filename', file.filename)
 
-    return resp_200(data={'id': id})
+    return resp(code=200, data={'id': id})
 
 
 async def retrive_record(request: Request):
@@ -71,7 +71,7 @@ async def retrive_reocrds(request: Request):
             item['id'] = id
             item['filename'] = await redis.hget(id, 'filename')
             result.append(item)
-    return resp_200(data=result)
+    return resp(code=200, data=result)
 
 
 # 路由参数，和 django 中的差不多，有五种类型——int、str、float、uuid、path
