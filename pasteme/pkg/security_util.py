@@ -20,7 +20,7 @@ class SecurityBackend(AuthenticationBackend):
 
         if conn.url.path == '/users/login' or conn.url.path == '/users/register':
             return
-        if conn.url.path.startswith('/records/') and conn.url.path != '/records/':
+        if conn.url.path.startswith('/records/') and conn.url.path != '/records/' and conn.get('method') == 'GET':
             return
 
         if 'Authorization' not in conn.headers:
