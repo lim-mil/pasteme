@@ -13,7 +13,7 @@ from pasteme.api.user import mount as user_monut
 from pasteme.api.record import mount as record_mount
 from pasteme.pkg.exception import handle_401
 from pasteme.pkg.security_util import SecurityBackend
-from pasteme.utils.email_util import EMAIL
+
 
 routes = [
     user_monut,
@@ -31,7 +31,7 @@ middleware = [
 on_startup = [
     create_tables,
     REDIS_POOL.connect,
-    EMAIL.login_email
+
 ]
 
 

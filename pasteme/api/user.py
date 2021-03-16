@@ -1,3 +1,6 @@
+import base64
+from typing import Optional
+
 from starlette.background import BackgroundTask
 from starlette.requests import Request
 from starlette.responses import PlainTextResponse, JSONResponse
@@ -33,7 +36,16 @@ async def register(request: Request):
     return resp(code=200, background=task)
 
 
+async def checkout(request: Request):
+    code = request.path_params.get('code')
+    username = base64.b64decode(code).decode()
+    user: Optional[UserModel] = UserModel.get_or_none(UserModel.username == username)
+    user.status = 0
+    return
+
+
 mount = Mount('/users', name='users', routes=[
     Route('/login', login, methods=['POST'], name='login'),
-    Route('/register', register, methods=['POST'], name='register')
+    Route('/register', register, methods=['POST'], name='register'),
+    Route('/checkout/{code:str}', checkout, methods=['GET'], name='checkout')
 ])
