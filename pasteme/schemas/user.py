@@ -12,3 +12,8 @@ class UserInCreate(BaseModel):
         if 'password' in values and values['password'] == v:
             return v
         raise ValueError("confirm_password is different from password")
+
+
+class UserInLogin(BaseModel):
+    username: str
+    password: str

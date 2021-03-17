@@ -10,7 +10,7 @@ from pasteme import config
 from pasteme.models.UserModel import UserModel
 from pasteme.pkg.response import resp
 from pasteme.pkg.security_util import create_jwt_token
-from pasteme.schemas.user import UserInCreate
+from pasteme.schemas.user import UserInCreate, UserInLogin
 from pasteme.utils.email_util import send_email
 
 
@@ -18,11 +18,14 @@ async def login(reuqest: Request):
     user_info = await reuqest.json()
     username = user_info.get('username')
     password = user_info.get('password')
-    if username == config.USERNAME and password == config.PASSWORD:
+    user: Optional[UserModel] = UserModel.get_or_none(UserModel.username == username)
+    if user and user.password == password:
         result = {
             'token': create_jwt_token(user_info)
         }
         return resp(data=result)
+    else:
+        return resp(code=401, msg="用户名或密码错误")
 
 
 async def register(request: Request):
@@ -41,7 +44,9 @@ async def checkout(request: Request):
     username = base64.b64decode(code).decode()
     user: Optional[UserModel] = UserModel.get_or_none(UserModel.username == username)
     user.status = 0
-    return
+    user.save()
+    jwt = create_jwt_token(UserInLogin.from_orm(user))
+    return resp(code=200, data={'jwt_token': jwt})
 
 
 mount = Mount('/users', name='users', routes=[

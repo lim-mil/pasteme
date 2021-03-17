@@ -1,10 +1,12 @@
 import hashlib
 import os
+from io import BytesIO
 from json.decoder import JSONDecodeError
 from typing import Optional
 
 import aiofiles
 import aiofiles.os
+from PIL import Image
 
 from pasteme import config
 from pasteme.pkg.redis import GetRedis, RedisTBName
@@ -49,8 +51,9 @@ async def create_record(request: Request):
                 filename_server = await give_me_a_name()
             await redis.hset(md5, 'filename', filename_server)
             await redis.hset(md5, 'num', 1)
-            async with aiofiles.open(os.path.join(MEDIA_DIR, filename_server), mode='wb') as f:
-                await f.write(content)
+            Image.open(BytesIO(content)).convert('RGB').save(os.path.join(MEDIA_DIR, filename_server), 'WEBP')
+            # async with aiofiles.open(os.path.join(MEDIA_DIR, filename_server), mode='wb') as f:
+            #     await f.write(content)
         id = await give_me_a_name()
         while await redis.exists(id):
             id = await give_me_a_name()
