@@ -13,5 +13,5 @@ def create_tables():
 
     MYSQL_DB.create_tables([UserFileModel, UserModel], safe=True)
 
-    if not os.path.exists(os.path.join(config.BASE_DIR, 'media')):
-        os.mkdir(os.path.join(config.BASE_DIR, 'media'))
+    # if not os.path.exists(os.path.join(config.BASE_DIR, 'media')):
+    #     os.mkdir(os.path.join(config.BASE_DIR, 'media'))
