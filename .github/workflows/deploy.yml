@@ -54,7 +54,7 @@ jobs:
           script: |
             docker stop pasteme-backend
             docker container rm pasteme-backend
-            docker image rm ${{ secrets.DOCKER_REPOSITORY }} -f
+            docker image rm ${{ secrets.DOCKER_REPOSITORY }}:latest -f
             docker login --username ${{ secrets.DOCKER_USERNAME }} --password ${{ secrets.DOCKER_PASSWORD }} registry.cn-hangzhou.aliyuncs.com
             docker pull ${{ secrets.DOCKER_REPOSITORY }}:latest
             docker run -d -p 127.0.0.1:7332:7332 --name pasteme-backend ${{ secrets.DOCKER_REPOSITORY }}
