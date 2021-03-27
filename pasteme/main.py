@@ -1,3 +1,5 @@
+import os
+
 import uvicorn
 from pasteme.pkg.db import create_tables
 from pasteme.pkg.redis import REDIS_POOL
@@ -18,7 +20,7 @@ from pasteme.pkg.security_util import SecurityBackend
 routes = [
     user_monut,
     record_mount,
-    Mount('/meida', app=StaticFiles(directory='media'), name='media')
+    Mount('/meida', app=StaticFiles(directory=os.path.join(config.BASE_DIR, 'media')), name='media')
 ]
 
 
