@@ -39,6 +39,7 @@ jobs:
             docker build -t ${{ secrets.DOCKER_REPOSITORY }}:latest .
             docker login --username ${{ secrets.DOCKER_USERNAME }} --password ${{ secrets.DOCKER_PASSWORD }} registry.cn-hangzhou.aliyuncs.com
             docker push ${{ secrets.DOCKER_REPOSITORY }}:latest
+            docker image rm ${{ secrets.DOCKER_REPOSITORY }}:latest -f
   run:
     needs: [deploy]
     name: Pull And Run Docker
