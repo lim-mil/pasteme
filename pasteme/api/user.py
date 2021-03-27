@@ -20,6 +20,7 @@ async def login(reuqest: Request):
     password = user_info.get('password')
     user: Optional[UserModel] = UserModel.get_or_none(UserModel.username == username)
     if user and user.password == password:
+        user_info['id'] = user.id
         result = {
             'token': create_jwt_token(user_info)
         }
